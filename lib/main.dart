@@ -407,24 +407,34 @@ class _HomeScreenState extends State<HomeScreen> {
           'Fast Complete!',
           'Your ${_fastingDuration.inHours}-hour fast has ended. Time to eat.',
         );
+
+        // Always add the completed fast to history
+        String recommendation;
         if (_prefetchedRecommendation != null) {
+          recommendation = _prefetchedRecommendation!;
           setState(() {
             _currentFoodRecommendation = _prefetchedRecommendation;
-            _history.insert(
-              0,
-              FastingSession(
-                id: DateTime.now().toIso8601String(),
-                date: DateTime.now(),
-                duration: _fastingDuration,
-                foodRecommendation: _currentFoodRecommendation!,
-              ),
-            );
             _prefetchedRecommendation = null;
           });
         } else {
-          // If no prefetched recommendation, generate one for the feeding window
-          _generateFeedingRecommendation();
+          // Use a temporary recommendation for history, will be updated when generated
+          recommendation =
+              "Enjoy a balanced, nutritious meal to break your fast!";
+          _generateFeedingRecommendation(addToHistory: true);
         }
+
+        // Add to history
+        setState(() {
+          _history.insert(
+            0,
+            FastingSession(
+              id: DateTime.now().toIso8601String(),
+              date: DateTime.now(),
+              duration: _fastingDuration,
+              foodRecommendation: recommendation,
+            ),
+          );
+        });
       }
       newStatus = FastingStatus.feeding;
       newCountdownTime = Duration.zero;
@@ -592,7 +602,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _generateFeedingRecommendation() async {
+  Future<void> _generateFeedingRecommendation({
+    bool addToHistory = false,
+  }) async {
     setState(() {
       _isRecommendationLoading = true;
     });
@@ -603,15 +615,36 @@ class _HomeScreenState extends State<HomeScreen> {
         _location,
       );
       if (mounted) {
-        setState(() => _currentFoodRecommendation = recommendation);
+        setState(() {
+          _currentFoodRecommendation = recommendation;
+          // Update the most recent history entry if this was for a completed fast
+          if (addToHistory && _history.isNotEmpty) {
+            _history[0] = FastingSession(
+              id: _history[0].id,
+              date: _history[0].date,
+              duration: _history[0].duration,
+              foodRecommendation: recommendation,
+            );
+          }
+        });
       }
     } catch (e) {
       print("Error generating feeding recommendation: $e");
       if (mounted) {
-        setState(
-          () => _currentFoodRecommendation =
-              "Enjoy a balanced, nutritious meal to break your fast!",
-        );
+        setState(() {
+          _currentFoodRecommendation =
+              "Enjoy a balanced, nutritious meal to break your fast!";
+          // Update history entry if needed
+          if (addToHistory && _history.isNotEmpty) {
+            _history[0] = FastingSession(
+              id: _history[0].id,
+              date: _history[0].date,
+              duration: _history[0].duration,
+              foodRecommendation:
+                  "Enjoy a balanced, nutritious meal to break your fast!",
+            );
+          }
+        });
       }
     } finally {
       if (mounted) {
