@@ -41,10 +41,16 @@ class NotificationService {
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
+    const macOSSettings = DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
 
     const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
+      macOS: macOSSettings,
     );
 
     await _notifications.initialize(initSettings);
@@ -86,9 +92,16 @@ class NotificationService {
       presentSound: true,
     );
 
+    const macOSDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
     const details = NotificationDetails(
       android: androidDetails,
       iOS: iosDetails,
+      macOS: macOSDetails,
     );
 
     await _notifications.show(
@@ -408,6 +421,9 @@ class _HomeScreenState extends State<HomeScreen> {
             );
             _prefetchedRecommendation = null;
           });
+        } else {
+          // If no prefetched recommendation, generate one for the feeding window
+          _generateFeedingRecommendation();
         }
       }
       newStatus = FastingStatus.feeding;
@@ -567,6 +583,34 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         setState(
           () => _prefetchedRecommendation = "Could not get a recommendation.",
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isRecommendationLoading = false);
+      }
+    }
+  }
+
+  Future<void> _generateFeedingRecommendation() async {
+    setState(() {
+      _isRecommendationLoading = true;
+    });
+    try {
+      final recommendation = await _foodService.getRecommendation(
+        _history.isNotEmpty ? _history.first.foodRecommendation : null,
+        _fastingDuration,
+        _location,
+      );
+      if (mounted) {
+        setState(() => _currentFoodRecommendation = recommendation);
+      }
+    } catch (e) {
+      print("Error generating feeding recommendation: $e");
+      if (mounted) {
+        setState(
+          () => _currentFoodRecommendation =
+              "Enjoy a balanced, nutritious meal to break your fast!",
         );
       }
     } finally {
@@ -747,6 +791,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFastingInfoSection() {
+    // During feeding window, always show the meal recommendation
+    if (_status == FastingStatus.feeding) {
+      // If we don't have a current recommendation, generate one
+      if (_currentFoodRecommendation == null && !_isRecommendationLoading) {
+        _generateFeedingRecommendation();
+      }
+
+      if (_currentFoodRecommendation != null) {
+        return _buildRecommendationCard(
+          title: "Enjoy your meal!",
+          recommendation: _currentFoodRecommendation!,
+        );
+      }
+    }
+
     // During the last hour of the fast, show the upcoming meal
     if (_status == FastingStatus.fasting && _prefetchedRecommendation != null) {
       return _buildRecommendationCard(
@@ -754,14 +813,7 @@ class _HomeScreenState extends State<HomeScreen> {
         recommendation: _prefetchedRecommendation!,
       );
     }
-    // After the fast, show the meal
-    if (_status == FastingStatus.feeding &&
-        _currentFoodRecommendation != null) {
-      return _buildRecommendationCard(
-        title: "Time to eat!",
-        recommendation: _currentFoodRecommendation!,
-      );
-    }
+
     // While waiting or fasting (and no meal is ready), show a tip
     if ((_status == FastingStatus.waiting ||
             _status == FastingStatus.fasting) &&
