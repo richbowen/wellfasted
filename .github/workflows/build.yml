@@ -169,7 +169,6 @@ jobs:
               cp "$apk" "release-assets/${new_name}"
             fi
           done
-          done
 
           # List all files for verification
           echo "📋 Release assets prepared:"
