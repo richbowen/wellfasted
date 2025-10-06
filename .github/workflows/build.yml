@@ -106,15 +106,21 @@ jobs:
 
       - name: 🏗️ Build APK (Debug)
         if: github.event_name == 'pull_request'
-        run: flutter build apk --debug
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: flutter build apk --debug --dart-define=GEMINI_API_KEY=$GEMINI_API_KEY --dart-define=ENV=development
 
       - name: 🏗️ Build APKs (Release - Split per ABI)
         if: github.event_name == 'push'
-        run: flutter build apk --release --split-per-abi
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: flutter build apk --release --split-per-abi --dart-define=GEMINI_API_KEY=$GEMINI_API_KEY --dart-define=ENV=production
 
       - name: 🏗️ Build Universal APK (Release)
         if: github.event_name == 'push'
-        run: flutter build apk --release
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: flutter build apk --release --dart-define=GEMINI_API_KEY=$GEMINI_API_KEY --dart-define=ENV=production
 
       - name: 📝 List build outputs
         run: |

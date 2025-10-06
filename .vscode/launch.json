@@ -1,0 +1,25 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "WellFasted (Development)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=GEMINI_API_KEY=your_api_key_here",
+        "--dart-define=ENV=development"
+      ]
+    },
+    {
+      "name": "WellFasted (Production)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=GEMINI_API_KEY=your_api_key_here",
+        "--dart-define=ENV=production"
+      ]
+    }
+  ]
+}

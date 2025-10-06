@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
+import 'config/app_config.dart';
+
 // --- MODELS ---
 class FastingSession {
   final String id;
@@ -114,9 +116,8 @@ class NotificationService {
 }
 
 class GeminiFoodRecommendationService {
-  final String _apiKey = 'AIzaSyBvitWCi4oBadrbhSeMFdS8RvF9ztPn8Bg';
-  final String _apiUrl =
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent';
+  final String _apiKey = AppConfig.geminiApiKey;
+  final String _apiUrl = AppConfig.geminiApiBaseUrl;
 
   String _getDayOfWeek(int day) {
     const days = [
@@ -143,8 +144,8 @@ class GeminiFoodRecommendationService {
     Duration fastingDuration,
     String location,
   ) async {
-    if (_apiKey == 'YOUR_API_KEY_HERE' || _apiKey.isEmpty) {
-      return "Please add your Gemini API Key to the `GeminiFoodRecommendationService` class.";
+    if (!AppConfig.hasValidGeminiApiKey) {
+      return "Please set your Gemini API Key using --dart-define=GEMINI_API_KEY=your_key_here when running the app.";
     }
     final now = DateTime.now();
     final prompt =
@@ -183,22 +184,28 @@ class GeminiFoodRecommendationService {
             return candidate['content']['parts'][0]['text'].trim();
           }
         }
-        debugPrint(
-          'GEMINI API WARNING: Response received, but no valid candidate content was found. Full Response: ${response.body}',
-        );
+        if (AppConfig.enableVerboseLogging) {
+          debugPrint(
+            'GEMINI API WARNING: Response received, but no valid candidate content was found. Full Response: ${response.body}',
+          );
+        }
         throw Exception(
           'The model returned an empty response. This may be due to safety settings.',
         );
       } else {
-        debugPrint(
-          'GEMINI API ERROR: Status ${response.statusCode}. Full Response: ${response.body}',
-        );
+        if (AppConfig.enableDebugLogs) {
+          debugPrint(
+            'GEMINI API ERROR: Status ${response.statusCode}. Full Response: ${response.body}',
+          );
+        }
         throw Exception(
           'Failed to get recommendation. Status: ${response.statusCode}.',
         );
       }
     } catch (e) {
-      debugPrint('Error during API call: $e');
+      if (AppConfig.enableDebugLogs) {
+        debugPrint('Error during API call: $e');
+      }
       rethrow;
     }
   }
@@ -207,6 +214,10 @@ class GeminiFoodRecommendationService {
 // --- MAIN APPLICATION ---
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Print app configuration (only in debug/development mode)
+  AppConfig.printConfig();
+
   await NotificationService.initialize();
   runApp(const FastingApp());
 }
@@ -217,8 +228,8 @@ class FastingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WellFasted',
-      debugShowCheckedModeBanner: false,
+      title: AppConfig.appName,
+      debugShowCheckedModeBanner: !AppConfig.isProduction,
       theme: ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
