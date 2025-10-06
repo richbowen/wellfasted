@@ -112,16 +112,14 @@ jobs:
         if: github.event_name == 'push'
         run: flutter build apk --release --split-per-abi
 
-      - name: 🏗️ Build App Bundle (Release)
+      - name: 🏗️ Build Universal APK (Release)
         if: github.event_name == 'push'
-        run: flutter build appbundle --release
+        run: flutter build apk --release
 
       - name: 📝 List build outputs
         run: |
           echo "🔍 APK outputs:"
           find build/app/outputs -name "*.apk" -type f || echo "No APKs found"
-          echo "🔍 AAB outputs:"
-          find build/app/outputs -name "*.aab" -type f || echo "No AABs found"
 
       - name: 📦 Upload Android APK artifacts
         if: github.event_name == 'push'
@@ -129,14 +127,6 @@ jobs:
         with:
           name: wellfasted-android-apks
           path: build/app/outputs/flutter-apk/*.apk
-          retention-days: 30
-
-      - name: 📦 Upload Android App Bundle artifacts
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: wellfasted-android-aab
-          path: build/app/outputs/bundle/release/*.aab
           retention-days: 30
 
       - name: 📦 Upload Debug APK (PR only)
@@ -166,12 +156,6 @@ jobs:
           name: wellfasted-android-apks
           path: release-artifacts/apks
 
-      - name: 📥 Download AAB artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: wellfasted-android-aab
-          path: release-artifacts/aab
-
       - name: 📦 Prepare release assets
         run: |
           mkdir -p release-assets
@@ -185,14 +169,6 @@ jobs:
               cp "$apk" "release-assets/${new_name}"
             fi
           done
-
-          # Copy AAB with descriptive name
-          for aab in release-artifacts/aab/*.aab; do
-            if [[ -f "$aab" ]]; then
-              filename=$(basename "$aab")
-              new_name="WellFasted-${{ github.ref_name }}-${filename}"
-              cp "$aab" "release-assets/${new_name}"
-            fi
           done
 
           # List all files for verification
