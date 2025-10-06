@@ -94,12 +94,12 @@ flutter:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/launcher.png"
-  # Use launcher.png for adaptive icons since it has no background
+  image_path: "assets/images/app_icon.png"
+  # Use app_icon.png for adaptive icons
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "assets/images/launcher.png"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
   remove_alpha_ios: true
-  # For web favicon, we might want to use app_icon.png if it has a proper background
+  # For web favicon
   web:
     generate: true
     image_path: "assets/images/app_icon.png"
@@ -113,4 +113,4 @@ flutter_launcher_icons:
   # For macOS
   macos:
     generate: true
-    image_path: "assets/images/launcher.png"
+    image_path: "assets/images/app_icon.png"
