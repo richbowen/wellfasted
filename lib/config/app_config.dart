@@ -1,5 +1,5 @@
-/// Application configuration using environment variables
-/// Use --dart-define to set these values at build time
+// Application configuration using environment variables
+// Use --dart-define to set these values at build time
 
 import 'package:flutter/foundation.dart';
 
