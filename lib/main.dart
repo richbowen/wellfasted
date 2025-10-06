@@ -183,14 +183,14 @@ class GeminiFoodRecommendationService {
             return candidate['content']['parts'][0]['text'].trim();
           }
         }
-        print(
+        debugPrint(
           'GEMINI API WARNING: Response received, but no valid candidate content was found. Full Response: ${response.body}',
         );
         throw Exception(
           'The model returned an empty response. This may be due to safety settings.',
         );
       } else {
-        print(
+        debugPrint(
           'GEMINI API ERROR: Status ${response.statusCode}. Full Response: ${response.body}',
         );
         throw Exception(
@@ -198,7 +198,7 @@ class GeminiFoodRecommendationService {
         );
       }
     } catch (e) {
-      print('Error during API call: $e');
+      debugPrint('Error during API call: $e');
       rethrow;
     }
   }
@@ -212,7 +212,7 @@ void main() async {
 }
 
 class FastingApp extends StatelessWidget {
-  const FastingApp({Key? key}) : super(key: key);
+  const FastingApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -226,9 +226,7 @@ class FastingApp extends StatelessWidget {
           primary: Color(0xFF4CAF50),
           secondary: Color(0xFF81C784),
           surface: Color(0xFF1A1A1A),
-          background: Color(0xFF0F0F0F),
           onSurface: Colors.white,
-          onBackground: Colors.white,
         ),
         scaffoldBackgroundColor: const Color(0xFF0F0F0F),
         cardTheme: const CardThemeData(
@@ -272,7 +270,7 @@ class FastingApp extends StatelessWidget {
 
 // --- SCREENS ---
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -589,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() => _prefetchedRecommendation = recommendation);
       }
     } catch (e) {
-      print("Error pre-fetching recommendation: $e");
+      debugPrint("Error pre-fetching recommendation: $e");
       if (mounted) {
         setState(
           () => _prefetchedRecommendation = "Could not get a recommendation.",
@@ -629,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       }
     } catch (e) {
-      print("Error generating feeding recommendation: $e");
+      debugPrint("Error generating feeding recommendation: $e");
       if (mounted) {
         setState(() {
           _currentFoodRecommendation =
@@ -668,7 +666,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
@@ -770,7 +768,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          colors: [timeColor.withOpacity(0.1), Colors.transparent],
+          colors: [timeColor.withValues(alpha: 0.1), Colors.transparent],
           radius: 1.5,
         ),
         borderRadius: BorderRadius.circular(24),
@@ -806,7 +804,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: timeColor,
               letterSpacing: 2,
               shadows: [
-                Shadow(color: timeColor.withOpacity(0.3), blurRadius: 8),
+                Shadow(color: timeColor.withValues(alpha: 0.3), blurRadius: 8),
               ],
             ),
             child: Text(
@@ -867,15 +865,17 @@ class _HomeScreenState extends State<HomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFF2196F3).withOpacity(0.1),
-            const Color(0xFF1A1A1A).withOpacity(0.9),
+            const Color(0xFF2196F3).withValues(alpha: 0.1),
+            const Color(0xFF1A1A1A).withValues(alpha: 0.9),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2196F3).withOpacity(0.3)),
+        border: Border.all(
+          color: const Color(0xFF2196F3).withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2196F3).withOpacity(0.1),
+            color: const Color(0xFF2196F3).withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -931,15 +931,17 @@ class _HomeScreenState extends State<HomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color(0xFFFF9800).withOpacity(0.1),
-            const Color(0xFF1A1A1A).withOpacity(0.9),
+            const Color(0xFFFF9800).withValues(alpha: 0.1),
+            const Color(0xFF1A1A1A).withValues(alpha: 0.9),
           ],
         ),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFFF9800).withOpacity(0.3)),
+        border: Border.all(
+          color: const Color(0xFFFF9800).withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF9800).withOpacity(0.1),
+            color: const Color(0xFFFF9800).withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -1004,9 +1006,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: const Text(
             'Configure your fasting schedule and start your wellness journey',
@@ -1058,18 +1060,18 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                const Color(0xFF4CAF50).withOpacity(0.2),
-                const Color(0xFF1A1A1A).withOpacity(0.8),
+                const Color(0xFF4CAF50).withValues(alpha: 0.2),
+                const Color(0xFF1A1A1A).withValues(alpha: 0.8),
               ],
             ),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: const Color(0xFF4CAF50).withOpacity(0.3),
+              color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.1),
+                color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -1081,7 +1083,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4CAF50).withOpacity(0.2),
+                  color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: const Color(0xFF4CAF50), size: 28),
@@ -1121,9 +1123,12 @@ class _HomeScreenState extends State<HomeScreen> {
       width: double.infinity,
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.white.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -1135,14 +1140,14 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Icon(
                 Icons.close_rounded,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 size: 20,
               ),
               const SizedBox(width: 8),
               Text(
                 'Stop Fasting',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.3,
@@ -1158,7 +1163,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class HistoryScreen extends StatelessWidget {
   final List<FastingSession> history;
-  const HistoryScreen({Key? key, required this.history}) : super(key: key);
+  const HistoryScreen({super.key, required this.history});
 
   @override
   Widget build(BuildContext context) {
@@ -1169,7 +1174,7 @@ class HistoryScreen extends StatelessWidget {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: IconButton(
@@ -1196,7 +1201,7 @@ class HistoryScreen extends StatelessWidget {
                       Icon(
                         Icons.history_rounded,
                         size: 64,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                       const SizedBox(height: 16),
                       const Text(
@@ -1229,17 +1234,17 @@ class HistoryScreen extends StatelessWidget {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFF4CAF50).withOpacity(0.1),
-                            const Color(0xFF1A1A1A).withOpacity(0.9),
+                            const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                            const Color(0xFF1A1A1A).withValues(alpha: 0.9),
                           ],
                         ),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                          color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
@@ -1255,7 +1260,7 @@ class HistoryScreen extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: const Color(
                                     0xFF4CAF50,
-                                  ).withOpacity(0.2),
+                                  ).withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: const Icon(
@@ -1293,7 +1298,7 @@ class HistoryScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.05),
+                              color: Colors.white.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
